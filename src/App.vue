@@ -1,26 +1,32 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <input type="file" @change="processImage" />
+    <div>
+      <img :src="preview.imageUrl" v-if="preview.imageUrl" />
+      <div v-if="extractedText">{{ extractedText }}</div>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Tesseract from "tesseract.js";
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    return {
+      preview: {
+        imageUrl: "",
+      },
+      extractedText: "",
+    };
+  },
+  methods: {
+    async processImage(event) {
+      const file = event.target.files[0];
+      this.preview.imageUrl = URL.createObjectURL(file);
+      const result = await Tesseract.recognize(file);
+      this.extractedText = result.text;
+    },
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
